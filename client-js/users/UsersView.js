@@ -8,11 +8,13 @@ import InviteUserForm from './InviteUserForm'
 class UsersView extends React.Component {
   state = {
     users: [],
+    connections: [],
     isSaving: false
   }
 
   componentDidMount() {
     document.title = 'SQLPad - Users'
+    this.loadConnectionsFromServer()
     this.loadUsersFromServer()
   }
 
@@ -23,6 +25,12 @@ class UsersView extends React.Component {
       }
       Alert.success('User Deleted')
       this.loadUsersFromServer()
+    })
+  }
+
+  loadConnectionsFromServer = () => {
+    fetchJson('GET', '/api/connections').then(json => {
+      this.setState({ connections: json.connections })
     })
   }
 
@@ -87,6 +95,7 @@ class UsersView extends React.Component {
           generatePasswordResetLink={this.generatePasswordResetLink}
           removePasswordResetLink={this.removePasswordResetLink}
           currentUser={currentUser}
+          connections={this.state.connections}
         />
         <InviteUserForm
           loadUsersFromServer={this.loadUsersFromServer}

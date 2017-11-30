@@ -61,17 +61,36 @@ router.get('/api/queries', mustBeAuthenticated, function(req, res) {
 
   });
   */
-  Query.findAll(function(err, queries) {
-    if (err) {
-      console.error(err)
+  if (req.user.role === 'admin') {
+    Query.findAll(function(err, queries) {
+      if (err) {
+        console.error(err)
+        return res.json({
+          error: 'Problem querying query database'
+        })
+      }
       return res.json({
-        error: 'Problem querying query database'
+        queries: queries
       })
-    }
-    return res.json({
-      queries: queries
     })
-  })
+  } else {
+    Query.findByFilter(
+      {
+        createdBy: req.user.email
+      },
+      function(err, queries) {
+        if (err) {
+          console.error(err)
+          return res.json({
+            error: 'Problem querying query database'
+          })
+        }
+        return res.json({
+          queries: queries
+        })
+      }
+    )
+  }
 })
 
 router.get('/api/queries/:_id', mustBeAuthenticatedOrChartLink, function(

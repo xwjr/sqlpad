@@ -75,18 +75,6 @@ class QueryListSidebar extends React.Component {
           </FormGroup>
           <br />
           <FormGroup controlId="formControlsSelect">
-            <ControlLabel>Created By</ControlLabel>
-            <FormControl
-              value={this.props.selectedCreatedBy}
-              componentClass="select"
-              onChange={this.onCreatedByChange}
-            >
-              <option value="">All</option>
-              {createdBySelectOptions}
-            </FormControl>
-          </FormGroup>
-          <br />
-          <FormGroup controlId="formControlsSelect">
             <ControlLabel>Sort By</ControlLabel>
             <FormControl componentClass="select" onChange={this.onSortByChange}>
               <option value="modifiedDate">Modified Date</option>

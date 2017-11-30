@@ -8,6 +8,7 @@ import {
 import Alert from 'react-s-alert'
 import fetchJson from './utilities/fetch-json.js'
 import UsersView from './users/UsersView'
+import UserDetail from './users/UserDetail'
 import ConnectionsView from './connections/ConnectionsView.js'
 import ConfigurationView from './configuration/ConfigurationView'
 import QueriesView from './queries/QueriesView'
@@ -85,6 +86,18 @@ class App extends React.Component {
               path="/users"
               render={() => (
                 <Authenticated admin={true} component={UsersView} />
+              )}
+            />
+            <Route
+              exact
+              path="/users/:userId/:email"
+              render={({ match }) => (
+                <Authenticated
+                  admin={true}
+                  userId={match.params.userId}
+                  email={match.params.email}
+                  component={UserDetail}
+                />
               )}
             />
             <Route

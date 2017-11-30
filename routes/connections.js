@@ -3,6 +3,7 @@ var runQuery = require('../lib/run-query.js')
 var cipher = require('../lib/cipher.js')
 var decipher = require('../lib/decipher.js')
 var Connection = require('../models/Connection.js')
+var UserConnections = require('../models/UserConnections.js')
 var mustBeAdmin = require('../middleware/must-be-admin.js')
 var mustBeAuthenticated = require('../middleware/must-be-authenticated.js')
 
@@ -33,22 +34,30 @@ function connectionFromBody(body) {
 }
 
 router.get('/api/connections', mustBeAuthenticated, function(req, res) {
-  Connection.findAll(function(err, connections) {
-    if (err) {
-      console.error(err)
-      return res.json({
-        error: 'Problem querying connection database'
+  if (req.user.role != 'admin') {
+    UserConnections.findByUserId(req.user.id, function(err, connections) {
+      res.json({
+        connections: connections
       })
-    }
-    connections = connections.map(connection => {
-      connection.username = decipher(connection.username)
-      connection.password = ''
-      return connection
     })
-    res.json({
-      connections: connections
+  } else {
+    Connection.findAll(function(err, connections) {
+      if (err) {
+        console.error(err)
+        return res.json({
+          error: 'Problem querying connection database'
+        })
+      }
+      connections = connections.map(connection => {
+        connection.username = decipher(connection.username)
+        connection.password = ''
+        return connection
+      })
+      res.json({
+        connections: connections
+      })
     })
-  })
+  }
 })
 
 router.get('/api/connections/:_id', mustBeAuthenticated, function(req, res) {

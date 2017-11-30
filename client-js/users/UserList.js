@@ -22,6 +22,7 @@ class UserList extends React.Component {
           generatePasswordResetLink={this.props.generatePasswordResetLink}
           removePasswordResetLink={this.props.removePasswordResetLink}
           currentUser={this.props.currentUser}
+          connections={this.props.connections}
         />
       )
     })

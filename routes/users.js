@@ -1,6 +1,7 @@
 var router = require('express').Router()
 var nodemailer = require('nodemailer')
 var User = require('../models/User.js')
+var UserConnections = require('../models/UserConnections.js')
 var config = require('../lib/config.js')
 var mustBeAdmin = require('../middleware/must-be-admin.js')
 var mustBeAuthenticated = require('../middleware/must-be-authenticated.js')
@@ -144,6 +145,68 @@ router.delete('/api/users/:_id', mustBeAdmin, function(req, res) {
       console.error(err)
       return res.json({
         error: 'Problem deleting user in database'
+      })
+    }
+    return res.json({})
+  })
+})
+
+router.post('/api/users/connections', mustBeAdmin, function(req, res) {
+  UserConnections.findOneByConnectionId(
+    req.body.connectionId,
+    req.body.userId,
+    function(err, user) {
+      if (err) {
+        console.error(err)
+        return res.json({ error: 'Problem querying user database' })
+      }
+      if (user) {
+        return res.json({ error: 'Connections already exists' })
+      }
+      var newUser = new UserConnections({
+        connectionId: req.body.connectionId,
+        name: req.body.name,
+        userId: req.body.userId
+      })
+      newUser.save(function(err, user) {
+        console.log(user)
+        if (err) {
+          console.error(err.toString())
+          return res.json({
+            error: 'Problem saving user to database'
+          })
+        }
+        return res.json(user)
+      })
+    }
+  )
+})
+
+router.get('/api/users/:id/connections', function(req, res) {
+  if (req.isAuthenticated()) {
+    UserConnections.findByUserId(req.params.id, function(err, connections) {
+      res.json({
+        connections: connections
+      })
+    })
+  } else {
+    // respond with empty object since this isn't really an error
+    res.json({})
+  }
+})
+
+// delete
+router.delete('/api/users/:userId/connections/:name', mustBeAdmin, function(
+  req,
+  res
+) {
+  UserConnections.removeOneByName(req.params.userId, req.params.name, function(
+    err
+  ) {
+    if (err) {
+      console.error(err)
+      return res.json({
+        error: 'Problem deleting connection'
       })
     }
     return res.json({})
